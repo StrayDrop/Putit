@@ -36,7 +36,8 @@ const App = () => {
 
   
   // Effects
-	// ------------------------------
+  // ------------------------------
+  
   useEffect(() => {
       firebase.auth().onAuthStateChanged(user => {
         setState({ isSignedIn: Boolean(user) })
