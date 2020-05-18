@@ -1,4 +1,4 @@
-import React, { Component , useEffect , useState , useRef , componentDidMount } from 'react'
+import React, { Component , useEffect , useState } from 'react'
 import "./App.css"
 import firebase from "firebase"
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
@@ -28,10 +28,15 @@ const App = () => {
     }
   }
 
+  // States
+	// ------------------------------
   const [ state, setState ] = useState(
     { isSignedIn: false }
   )
 
+  
+  // Effects
+	// ------------------------------
   useEffect(() => {
       firebase.auth().onAuthStateChanged(user => {
         setState({ isSignedIn: Boolean(user) })
@@ -39,37 +44,47 @@ const App = () => {
       })
   },[])
 
+  // Logics
+	// ------------------------------
+  const LandingContent = ({ uiConfig, isSignedIn }) => {
+
+    // Components
+    // ------------------------------
+    const SignInBox = () => (
+      <>
+        <StyledFirebaseAuth
+          uiConfig={uiConfig}
+          firebaseAuth={firebase.auth()}
+        />
+      </>
+    )
+
+    const ProfileBox = () => (
+      <>
+        <span>
+        <div>Signed In!</div>
+        <button onClick={() => firebase.auth().signOut()}>Sign out!</button>
+        <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
+        <img
+          alt="profile picture"
+          src={firebase.auth().currentUser.photoURL}
+        />
+        </span>
+      </>
+    )
+
+    if ( isSignedIn!==true ) { return (<SignInBox />) }
+    else { return (<ProfileBox />) }
+  }
+
+	// Render
+	// ------------------------------
   return (
     <div className="App">
-      {state.isSignedIn ?  <ProfileContent/> : <SignInContent uiConfig={uiConfig}/>}
+      <LandingContent uiConfig={uiConfig} isSignedIn={state.isSignedIn} />
     </div>
   )
 
 }
-
-
-const ProfileContent = () => (
-  <>
-    <span>
-    <div>Signed In!</div>
-    <button onClick={() => firebase.auth().signOut()}>Sign out!</button>
-    <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
-    <img
-      alt="profile picture"
-      src={firebase.auth().currentUser.photoURL}
-    />
-    </span>
-  </>
-)
-
-const SignInContent = ({uiConfig}) => (
-  <>
-    <StyledFirebaseAuth
-      uiConfig={uiConfig}
-      firebaseAuth={firebase.auth()}
-    />
-  </>
-)
-
 
 export default App
